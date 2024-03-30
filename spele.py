@@ -1,7 +1,7 @@
 #izveido virsotnes objektu
 class Virs:
     #pieskir virsotnei atributus
-    def __init__(self, id ,akmenuSk, p1, a1, p2, a2, lvl,p1_rez=0,p2_rez=0):
+    def __init__(self, id ,akmenuSk, p1, a1, p2, a2, lvl,p1_rez=0,p2_rez=0): #Kokam pieliku vēl divus elementus p1_rez un p2_rez
         self.id = id
         self.akmenuSk = akmenuSk
         self.p1 = p1
