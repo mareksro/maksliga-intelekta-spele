@@ -1,7 +1,7 @@
 #izveido virsotnes objektu
 class Virs:
     #pieskir virsotnei atributus
-    def __init__(self, id ,akmenuSk, p1, a1, p2, a2, lvl,p1_rez=0,p2_rez=0): #Kokam pieliku vēl divus elementus p1_rez un p2_rez
+    def __init__(self, id ,akmenuSk, p1, a1, p2, a2, lvl):
         self.id = id
         self.akmenuSk = akmenuSk
         self.p1 = p1
@@ -9,8 +9,7 @@ class Virs:
         self.p2 = p2
         self.a2 = a2
         self.lvl = lvl
-        self.p1_rez=p1_rez      
-        self.p2_rez=p2_rez
+        
 
 #izveido koka strukturu
 class Koks:
@@ -153,91 +152,116 @@ for x in spele.virsotnes:
 for x, y in spele.loki.items():
     print(x, y)   
 
+
+
+
+
 ################################
     # funkcija tiek definēta:
     #virsotne - speles stāvoklis
     #max_speletajs - norada, vai ir maksimizejosais speletajs
     #dzilums_robeza - rekursijas dziluma ierobezojums
-def MiniMax(virsotne,max_speletajs,dzilums_robeza):
+def MiniMax(virsotne,dzilums,max_speletajs):
 
     #parbaude vai uz galda nav akmentiņu vai ir sasniegs dziluma ierobezojums
-    if virsotne.akmenuSk == 0 or dzilums_robeza == 0:
-        # aprekina gala rezultatus speletajiem, pieskaitot atlikusos akmenus pie punktiem
-        p1_gala_rez = virsotne.p1_rez + virsotne.akmenuSk
-        p2_gala_rez = virsotne.p2_rez + virsotne.akmenuSk
+    if virsotne.akmenuSk == 0 or dzilums == 0:
 
-        # nosaka uzvarētāju vai arī ir neizšķirts
-        if p1_gala_rez > p2_gala_rez:
-            print("Uzvar Spēlētājs 1. Punktu skaits:", p1_gala_rez)
-        elif p1_gala_rez < p2_gala_rez:
-            print("Uzvar Spēlētājs 2. Punktu skaits:", p2_gala_rez)
-        else:
-            print("Neizšķirts. Punktu skaits:", p1_gala_rez)
+        return virsotne.p1 - virsotne.p2, None
         
-        #atgriež rezultatu un labako gajienu, šobrīd nav labākā gajiena, tāpēc 0 vai None
-        if p1_gala_rez == p2_gala_rez:
-            return 0, None
-        else:
-            return virsotne.p1_rez - virsotne.p2_rez, 0
         
     
     #ja tagadējais spēlētājs ir max, tiek inicializēts mainīgais maxNovert ar negatīvu bezgalību, lai nākamā novērtējuma vērtība būtu lielāka
     if max_speletajs:
         maxNovert= float('-inf')
         #tiek ņemts vērā labākais gajiens
-        labakais_gajiens = 0
+        labakais_gajiens = None
         #cikls iet cauri iespējamajiem gājieniem - paņemt 2 vai 3 akmeņus
         for gajiens in [2,3]:
             if virsotne.akmenuSk >= gajiens: #pārbauda, vai ir pietiekami daudz akmeņu, lai izpilditu gājienu
-                jaunie_akmeni = virsotne.akmenuSk - gajiens #aprēķina atlikušo akmentiņu skaitu pēc gājiena
-                punkti_p1_jaunie = virsotne.p1_rez + gajiens #aprēķina jauno punktu skaitu pēc gajiena
-                 
-                #Ja atlikušais akmentiņu skaits ir pāra skaitlis, tad pievieno 2 punktus, ja nepāra - noņem 2 punktus
-                punkti_jaunie = punkti_p1_jaunie
-                if jaunie_akmeni % 2 == 0:
-                    punkti_jaunie += 2
-                else:
-                    punkti_jaunie -= 2
-                
-                #izveidots jauns spēles stāvoklis pēc gājiena
-                jauna_virsotne = Virs(0,jaunie_akmeni,0,0,0,0,0,punkti_jaunie,virsotne.p2_rez)
 
+                #izveidots jauns spēles stāvoklis pēc gājiena
+                jauna_virsotne = Virs(0,virsotne.akmenuSk - gajiens,virsotne.p1,virsotne.a2,virsotne.p2+gajiens,virsotne.a2,virsotne.lvl+1)
                 #rekursivi izsauc funkciju ar jauno spēles stāvokli, parsledzoties uz min speletaju un samazinot dziļuma ierobežojumu
-                vertiba = MiniMax(jauna_virsotne,False, dzilums_robeza - 1)[0]
+                vertiba = MiniMax(jauna_virsotne, dzilums - 1,False)[0]
                 #atjaunina maksimalo novertējumu un labako gajienu, ja ir atrasta labāka vērtība
                 if vertiba > maxNovert:
                     maxNovert = vertiba
                     labakais_gajiens = gajiens
         # atgriež maksimālo novērtējumu un labāko gajienu maksimizējošam speletajam
         return maxNovert, labakais_gajiens
-            
+
     else: #gājienu veic minimizējošais spēlētājs ar līdzīgu algoritmu, mēģinot minimizēt punktu skaitu
         minNovert = float('inf')
         for gajiens in [2,3]:
             if virsotne.akmenuSk >= gajiens:
-                jaunie_akmeni = virsotne.akmenuSk - gajiens
-                punkti_p2_jaunie = virsotne.p2_rez + gajiens 
-                punkti_jaunie = punkti_p2_jaunie
-                #Ja atlikušais akmentiņu skaits ir pāra skaitlis, tad pievieno 2 punktus, ja nepāra - noņem 2 punktus
-                if jaunie_akmeni % 2 == 0:
-                    punkti_jaunie += 2
-                else:
-                    punkti_jaunie -= 2
-                jauna_virsotne = Virs(0,jaunie_akmeni,0,0,0,0,0,virsotne.p1_rez,punkti_jaunie)
-                vertiba = MiniMax(jauna_virsotne,True,dzilums_robeza-1)[0]
+                jauna_virsotne = Virs(0,virsotne.akmenuSk - gajiens,virsotne.p1,virsotne.a2,virsotne.p2+gajiens,virsotne.a2,virsotne.lvl+1)
+               
+                vertiba = MiniMax(jauna_virsotne,dzilums-1,True)[0]
                 if vertiba < minNovert:
                     minNovert = vertiba
-                    
-        return minNovert,0
+                    labakais_gajiens= gajiens
+        return minNovert, 0
     
+def speletajs():
+    izv = input("Izvēlies paņemt 2 vai 3 akmentiņus: ")
+    while izv not in ['2', '3']:
+        print("error")
+        izv = input("Izvēlies paņemt 2 vai 3 akmentiņus: ")
+    return int(izv)
 
-#izveidots sākotnējs spēles stāvoklis
-saknes_virsotne = Virs('V1', akmeni, 0, 0, 0, 0, 1, 0, 0)
-#uzstādīts dziluma ierobežojums
-noteikts_dzilums =10
-# izsaukt funkciju ar saknes virsotni un norāda, ka sākotnējais spēlētājs ir max
-result, best_move = MiniMax(saknes_virsotne, True, noteikts_dzilums)
 
-# Print out the result
-print("Result:", result)
-    
+def play():
+    tagad_stavoklis = Virs('V1', akmeni, 0, 0, 0, 0, 1)
+    speletaja_punkti = 0
+    datora_punkti = 0 
+    while tagad_stavoklis.akmenuSk > 0:
+        print(f"Atlikušie akmentiņi: {tagad_stavoklis.akmenuSk}")
+        spel_izvele = speletajs()
+        tagad_stavoklis.akmenuSk -= spel_izvele
+        speletaja_punkti += spel_izvele
+
+        if tagad_stavoklis.akmenuSk % 2 == 0:
+            speletaja_punkti += 2
+        else:
+            speletaja_punkti -= 2
+
+        print(f"Tu paņēmi {spel_izvele} akmentiņus. Atlikušie akmeņi: {tagad_stavoklis.akmenuSk}")
+        print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
+        if tagad_stavoklis.akmenuSk <=0:
+            print("\nGala punkti:")
+            print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
+            print("Uzvara!")
+            break
+
+        dators_izvele = MiniMax(tagad_stavoklis, 1, True)[1]
+        print (f"Dators paņem {dators_izvele} akmentiņus.")
+        print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
+        tagad_stavoklis.akmenuSk -= dators_izvele
+        datora_punkti += dators_izvele
+        if tagad_stavoklis.akmenuSk % 2 == 0:
+            datora_punkti += 2
+        else:
+            datora_punkti -=2
+        if tagad_stavoklis.akmenuSk <=0:
+            print("\nGala punkti:")
+            print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
+            print("Dators uzvar!")
+            break
+play()
+
+
+
+#print("Izvēlieties algoritmu:")
+#izvele = input("Ievadiet M vai A: ")
+
+#if izvele == 'M':
+        # Izsauc Minimax algoritmu
+    #result = MiniMax(saknes_virsotne, dzilums, True)
+    #print("Izvēlēts Minimax algoritms.")
+#elif izvele == 'A':
+        # Izsauc Alpha-Beta algoritmu
+        
+#    print("Izvēlēts Alpha-Beta algoritms.")
+
+
+
