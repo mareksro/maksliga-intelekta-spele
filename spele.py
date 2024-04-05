@@ -210,43 +210,66 @@ def speletajs():
     return int(izv)
 
 
+def saks_speli():
+    izvele = input("Vai spēli sāks spēlētājs (1) vai dators (2): ").strip()
+    while izvele not in ['1','2']:
+        print("error")
+        izvele = input("Vai spēli sāks spēlētājs (1) vai dators (2): ").strip()
+    return izvele
+
+
 def play():
+    uzsacejs = saks_speli()
     tagad_stavoklis = Virs('V1', akmeni, 0, 0, 0, 0, 1)
     speletaja_punkti = 0
     datora_punkti = 0 
     while tagad_stavoklis.akmenuSk > 0:
-        print(f"Atlikušie akmentiņi: {tagad_stavoklis.akmenuSk}")
-        spel_izvele = speletajs()
-        tagad_stavoklis.akmenuSk -= spel_izvele
-        speletaja_punkti += spel_izvele
 
-        if tagad_stavoklis.akmenuSk % 2 == 0:
-            speletaja_punkti += 2
-        else:
-            speletaja_punkti -= 2
+        if uzsacejs == '1' or uzsacejs == '2' and tagad_stavoklis.akmenuSk <=0:
+            print(f"Atlikušie akmentiņi: {tagad_stavoklis.akmenuSk}")
+            spel_izvele = speletajs()
+            tagad_stavoklis.akmenuSk -= spel_izvele
+            speletaja_punkti += spel_izvele
+        
 
-        print(f"Tu paņēmi {spel_izvele} akmentiņus. Atlikušie akmeņi: {tagad_stavoklis.akmenuSk}")
-        print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
+            if tagad_stavoklis.akmenuSk % 2 == 0:
+                speletaja_punkti += 2
+            else:
+                speletaja_punkti -= 2
+
+            print(f"Tu paņēmi {spel_izvele} akmentiņus. Atlikušie akmeņi: {tagad_stavoklis.akmenuSk}")
+            print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
+      
+            uzsacejs = '2'
+            
+        if tagad_stavoklis.akmenuSk > 0 and uzsacejs == '2':
+            dators_izvele = MiniMax(tagad_stavoklis, 1, True)[1]
+            print (f"Dators paņem {dators_izvele} akmentiņus.")
+            print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
+        if dators_izvele is not None:   
+            tagad_stavoklis.akmenuSk -= dators_izvele
+            datora_punkti += dators_izvele
+            if tagad_stavoklis.akmenuSk % 2 == 0:
+                datora_punkti += 2
+            else:
+                datora_punkti -=2
+            print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
+
+            uzsacejs = '1'
+
+
         if tagad_stavoklis.akmenuSk <=0:
             print("\nGala punkti:")
             print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
-            print("Uzvara!")
+            if speletaja_punkti == datora_punkti:
+                print("Neizšķirts!")
+            elif speletaja_punkti > datora_punkti:
+                print("Uzvara!")
+            else:
+                print("Dators uzvar!")
             break
+        
 
-        dators_izvele = MiniMax(tagad_stavoklis, 1, True)[1]
-        print (f"Dators paņem {dators_izvele} akmentiņus.")
-        print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
-        tagad_stavoklis.akmenuSk -= dators_izvele
-        datora_punkti += dators_izvele
-        if tagad_stavoklis.akmenuSk % 2 == 0:
-            datora_punkti += 2
-        else:
-            datora_punkti -=2
-        if tagad_stavoklis.akmenuSk <=0:
-            print("\nGala punkti:")
-            print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
-            print("Dators uzvar!")
-            break
 play()
 
 
