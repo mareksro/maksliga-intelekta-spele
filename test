@@ -1,0 +1,373 @@
+import tkinter as tk
+from tkinter import messagebox
+
+#izveido virsotnes objektu
+class Virs:
+    #pieskir virsotnei atributus
+    def __init__(self, id ,akmenuSk, p1, a1, p2, a2, lvl):
+        self.id = id
+        self.akmenuSk = akmenuSk
+        self.p1 = p1
+        self.a1 = a1
+        self.p2 = p2
+        self.a2 = a2
+        self.lvl = lvl
+
+
+#izveido koka strukturu
+class Koks:
+    #pieskir kokam atributus, kuros glabat virsotnes un lokus
+    def __init__(self):
+        self.virsotnes = []
+        self.loki = dict()
+
+    #funkcija lai pievienotu virsotni virsotnu kopai
+    def piev_virs(self, Virs):
+        self.virsotnes.append(Virs)
+
+
+    #funkcija lai pievienotu loku loku kopai
+    def piev_loku(self, sVirs, bVirs):
+        self.loki[sVirs] = self.loki.get(sVirs,[]) + [bVirs]
+
+
+#funkcija kas apraksta speles gajienu. ka vertibas panem gajiena veidu (2akmeni vai 3), virsotnu kopu, virsotni, kura sobrid atrodas un speletaju, kurs sak gajienu
+def gajiens(gTips, genVirs, pasrV):
+
+    #pasrV --> Pašreizējā virsotne
+    #genVirs --> uzģenerēto virsotņu kopa
+    #gTips --> gājiena tips (2 vai 3 akmeni nonemti)
+
+    #ja akmeņi nav 0, tad izveido jaunas virsotnes id un aprekina tas akmenu skaitu
+    if pasrV[1] - int(gTips) >= 0:
+        global z
+        jauns_ID = 'V' + str(z)
+        jauni_akmeni = pasrV[1] - int(gTips)
+        #virsotnes numurs
+        z += 1
+
+
+
+
+        #atjauno punktu skaitu balstoties uz speles noteikumiem atskiriba no gajiena
+        #parbauda vai gajiena tips ir 2 vai 3
+        if gTips == '2' or gTips == '3':
+            #parbaude kas parbauda vai virsotnes atrodas viena limeni --> vai gajienu veica viens vai otrs speletajs
+            if pasrV[6] % 2 != 0:
+                #parbauda vai jaunas virsotnes akmenu skaits ir para vai nepara
+                if (jauni_akmeni % 2) == 0 :
+                    p1_jPunkti = pasrV[2] + 2
+                    p2_jPunkti = pasrV[4]
+                    a1_jAkmeni = pasrV[3] + int(gTips)
+                    a2_jAkmeni = pasrV[5]
+                else:
+                    p1_jPunkti = pasrV[2] - 2
+                    p2_jPunkti = pasrV[4]
+                    a1_jAkmeni = pasrV[3] + int(gTips)
+                    a2_jAkmeni = pasrV[5]
+            else:
+                if (pasrV[1] % 2 == 0):
+                    p1_jPunkti = pasrV[2]
+                    p2_jPunkti = pasrV[4] + 2
+                    a1_jAkmeni = pasrV[3]
+                    a2_jAkmeni = pasrV[5] + int(gTips)
+                elif (pasrV[1] % 2 != 0):
+                    p1_jPunkti = pasrV[2]
+                    p2_jPunkti = pasrV[4] - 2
+                    a1_jAkmeni = pasrV[3]
+                    a2_jAkmeni = pasrV[5] + int(gTips)
+        #ja gajiena tips nav 2 vai 3, tad jaunajam virsotnem pieskir pasreizejas virsotnes vertibas
+        else:
+            p1_jPunkti = pasrV[2]
+            p2_jPunkti = pasrV[4]
+            a1_jAkmeni = pasrV[3]
+            a2_jAkmeni = pasrV[5]
+
+
+
+        #nosaka jaunas virsotnes limeni
+        jauns_LVL = pasrV[6] + 1
+        #pieskir jaunajai virsotnei atributu vertibas
+        jauna_Virs = Virs(jauns_ID, jauni_akmeni, p1_jPunkti, a1_jAkmeni, p2_jPunkti, a2_jAkmeni, jauns_LVL)
+
+        test = False
+        #mainigais kas norada virsotnes kartas skaitli kopa
+        k = 0
+
+        #parbauda vai jauna virsotne jau pastav koka
+        while (not test) and (k < len(spele.virsotnes) - 1):
+            if(spele.virsotnes[k].akmenuSk == jauna_Virs.akmenuSk) and (spele.virsotnes[k].p1 == jauna_Virs.p1) and (spele.virsotnes[k].a1 == jauna_Virs.a1) and (spele.virsotnes[k].p2 == jauna_Virs.p2) and (spele.virsotnes[k].a2 == jauna_Virs.a2) and (spele.virsotnes[k].lvl == jauna_Virs.lvl):
+                test = True
+            else:
+                k += 1
+        #ja nepastav pievieno kokam gan virsotni gan loku
+        if not test:
+            spele.piev_virs(jauna_Virs)
+            genVirs.append([jauns_ID, jauni_akmeni, p1_jPunkti, a1_jAkmeni, p2_jPunkti, a2_jAkmeni, jauns_LVL])
+            spele.piev_loku(pasrV[0], jauns_ID)
+
+
+        #ja pastav tad pievieno tikai papildus loku kas aizved uz so virsotni
+        else:
+            z -= 1
+            spele.piev_loku(pasrV[0], spele.virsotnes[k].id)
+
+###############################
+def is_terminal(node):
+    # Spele beidzas kad akmenu vairs nav
+    return node.akmeni == 0
+
+def static_evaluation(node):
+    # Spēlētāja iegūto akmeņu skaits tiek pievienots spēlētāja rezultātam.
+    # Ja pēc akmeņu ņemšanas uz galda ir palicis pāra skaits akmeņu,
+    # tad spēlētāja rezultātam tiek pievienoti 2 punkti, un, ja ir nepāra skaitlis,
+    # tad tiek atskaitīti 2 punkti.
+    if node.akmeni % 2 == 0:
+        node.speletaja_punkti += 2
+    else:
+        node.speletaja_punkti -= 2
+
+    node.speletaja_punkti += node.stones_taken
+
+    # Ja spēlētājiem ir vienāds punktu skaits, rezultāts ir neizšķirts.
+    # Pretējā gadījumā uzvar spēlētājs, kuram ir vairāk punktu.
+    if node.speletaja_punkti == node.pretinieka_punkti:
+        return 0  # Neizskirts
+    elif node.speletaja_punkti > node.pretinieka_punkti:
+        return 1  # Speletajs uzvar
+    else:
+        return -1  # Dators uzvar
+
+def AlfaBeta(node, depth, alpha, beta, maximizingPlayer):
+    if depth == 0 or is_terminal(node):
+        return static_evaluation(node)
+
+    if maximizingPlayer:
+        maxEva = float('-inf')
+        for child in node.children():
+            eva = AlfaBeta(child, depth-1, alpha, beta, False)
+            maxEva = max(maxEva, eva)
+            alpha = max(alpha, eva)
+            if beta <= alpha:
+                break
+        return maxEva
+
+    else:
+        minEva = float('inf')
+        for child in node.children():
+            eva = AlfaBeta(child, depth-1, alpha, beta, True)
+            minEva = min(minEva, eva)
+            beta = min(beta, eva)
+            if beta <= alpha:
+                break
+        return minEva
+
+################################
+# funkcija tiek definēta:
+#virsotne - speles stāvoklis
+#max_speletajs - norada, vai ir maksimizejosais speletajs
+#dzilums_robeza - rekursijas dziluma ierobezojums
+def MiniMax(virsotne,dzilums,max_speletajs):
+
+    #parbaude vai uz galda nav akmentiņu vai ir sasniegs dziluma ierobezojums
+    if virsotne.akmenuSk == 0 or dzilums == 0:
+
+        return virsotne.p1 - virsotne.p2, None
+
+    #ja tagadējais spēlētājs ir max, tiek inicializēts mainīgais maxNovert ar negatīvu bezgalību, lai nākamā novērtējuma vērtība būtu lielāka
+    if max_speletajs:
+        maxNovert= float('-inf')
+        #tiek ņemts vērā labākais gajiens
+        labakais_gajiens = None
+        #cikls iet cauri iespējamajiem gājieniem - paņemt 2 vai 3 akmeņus
+        for gajiens in [2,3]:
+            if virsotne.akmenuSk >= gajiens: #pārbauda, vai ir pietiekami daudz akmeņu, lai izpilditu gājienu
+
+                #izveidots jauns spēles stāvoklis pēc gājiena
+                jauna_virsotne = Virs(0,virsotne.akmenuSk - gajiens,virsotne.p1,virsotne.a2,virsotne.p2+gajiens,virsotne.a2,virsotne.lvl+1)
+                #rekursivi izsauc funkciju ar jauno spēles stāvokli, parsledzoties uz min speletaju un samazinot dziļuma ierobežojumu
+                vertiba = MiniMax(jauna_virsotne, dzilums - 1,False)[0]
+                #atjaunina maksimalo novertējumu un labako gajienu, ja ir atrasta labāka vērtība
+                if vertiba > maxNovert:
+                    maxNovert = vertiba
+                    labakais_gajiens = gajiens
+        # atgriež maksimālo novērtējumu un labāko gajienu maksimizējošam speletajam
+        return maxNovert, labakais_gajiens
+
+    else: #gājienu veic minimizējošais spēlētājs ar līdzīgu algoritmu, mēģinot minimizēt punktu skaitu
+        minNovert = float('inf')
+        for gajiens in [2,3]:
+            if virsotne.akmenuSk >= gajiens:
+                jauna_virsotne = Virs(0,virsotne.akmenuSk - gajiens,virsotne.p1,virsotne.a2,virsotne.p2+gajiens,virsotne.a2,virsotne.lvl+1)
+
+                vertiba = MiniMax(jauna_virsotne,dzilums-1,True)[0]
+                if vertiba < minNovert:
+                    minNovert = vertiba
+                    labakais_gajiens= gajiens
+        return minNovert, 0
+
+
+class GameGUI:
+    def __init__(self, master):
+
+        self.master = master
+        self.master.title("Spēle ar akmeņiem")
+        master.geometry("400x400")
+
+        self.label = tk.Label(master, text="Laipni lūdzam spēlē! Izvēlieties akmeņu skaitu no 50 līdz 70")
+        self.label.pack()
+
+        self.stones_entry = tk.Entry(master)
+        self.stones_entry.pack()
+
+        self.start_button = tk.Button(master, text="Sākt spēli", command=self.play)
+        self.start_button.pack()
+
+        self.new_game_button = tk.Button(master, text="Jauna spēle", command=self.new_game)
+        self.new_game_button.pack()
+
+        self.start_player_label = tk.Label(master, text="Izvēlieties, kurš sāks spēli:")
+        self.start_player_label.pack()
+
+        self.stav = tk.StringVar(value='1')
+
+        self.user_radio = tk.Radiobutton(master, text="Lietotājs", variable=self.stav, value='1')
+        self.user_radio.pack()
+
+        self.computer_radio = tk.Radiobutton(master, text="Dators", variable=self.stav, value='2')
+        self.computer_radio.pack()
+
+        self.info_label = tk.Label(master, text="")
+        self.info_label.pack()
+
+        self.stones_label = tk.Label(master, text="")
+        self.stones_label.pack()
+
+        self.p1_stones_label = tk.Label(master, text="")
+        self.p1_stones_label.pack()
+
+        self.p2_stones_label = tk.Label(master, text="")
+        self.p2_stones_label.pack()
+
+        self.game_started = False
+        self.koks = Koks()
+
+        self.stones_to_take_label = tk.Label(master, text="Izvēlieties ņemamo akmeņu skaitu:")
+        self.stones_to_take_label.pack()
+
+        self.akmen_entry = tk.Entry(master)
+        self.akmen_entry.pack()
+
+        self.submit_button = tk.Button(master, text="Submit", command=self.play_move)
+        self.submit_button.pack()
+        self.submit_button.config(state="disabled")
+
+        self.algorithm_label = tk.Label(master, text="Izvēlieties algoritmu:")
+        self.algorithm_label.pack()
+
+        self.algorithm_selection = tk.StringVar(value='M')
+
+        self.minimax_radio = tk.Radiobutton(master, text="MiniMax", variable=self.algorithm_selection, value='M')
+        self.minimax_radio.pack()
+
+        self.alphabeta_radio = tk.Radiobutton(master, text="Alpha-Beta", variable=self.algorithm_selection, value='A')
+        self.alphabeta_radio.pack()
+
+
+    def play(self):
+        self.label.config(text="Spēle sākusies")
+        self.stones_label.config(text="")
+        self.p1_stones_label.config(text="")
+        self.p2_stones_label.config(text="")
+        self.info_label.config(text="")
+        try:
+            self.akmeni = int(self.stones_entry.get())
+            if self.akmeni>70 or self.akmeni<50:
+                self.label.config(text="!Izvēlieties akmeņu skaitu no 50 līdz 70!")
+                return
+            self.uzsacejs = self.stav.get()
+            self.tagad_stavoklis = Virs('V1', self.akmeni, 0, 0, 0, 0, 1)
+            self.speletaja_punkti = 0
+            self.datora_punkti = 0
+            self.algoritms= self.algorithm_selection.get()
+            if self.tagad_stavoklis.akmenuSk > 0 and self.uzsacejs == '2' and self.algoritms == 'M':
+                self.comp_move()
+            else:
+                self.submit_button.config(state="normal")
+        except ValueError:
+            self.label.config(text="Ievadiet pareizo akmeņu skaitu.")
+
+    def play_move(self):
+        try:
+            self.akmensk=int(self.akmen_entry.get())
+            if self.akmensk == 2:
+                self.spel_izvele = 2
+            elif self.akmensk == 3:
+                self.spel_izvele = 3
+            else:
+                self.stones_to_take_label.config(text="Ievadiet pareizo akmeņu skaitu.")
+                return
+            self.tagad_stavoklis.akmenuSk -= self.spel_izvele
+            self.speletaja_punkti += self.spel_izvele
+            if self.tagad_stavoklis.akmenuSk % 2 == 0:
+                self.speletaja_punkti += 2
+            else:
+                self.speletaja_punkti -= 2
+            self.akmen_entry.delete(0, tk.END)
+            self.game_over_check()
+            self.comp_move()
+        except ValueError:
+            self.stones_to_take_label.config(text="Ievadiet pareizo akmeņu skaitu.")
+
+    def comp_move(self):
+            if self.algoritms == 'M':
+                self.dators_izvele = MiniMax(self.tagad_stavoklis, 1, True)[1]
+            elif self.algoritms == 'A':
+                dators_izvele = AlfaBeta()
+
+            if self.dators_izvele is not None:
+                self.tagad_stavoklis.akmenuSk -= self.dators_izvele
+                self.datora_punkti += self.dators_izvele
+                if self.tagad_stavoklis.akmenuSk % 2 == 0:
+                    self.datora_punkti += 2
+                else:
+                    self.datora_punkti -=2
+                self.akmen_info(self.tagad_stavoklis.akmenuSk,self.speletaja_punkti, self.datora_punkti)
+                self.game_over_check()
+
+    def new_game(self):
+        self.label.config(text="Izvēlieties akmeņu skaitu (no 50 līdz 70):")
+        self.stones_entry.delete(0, tk.END)
+        self.akmen_entry.delete(0, tk.END)
+        self.stones_label.config(text="")
+        self.p1_stones_label.config(text="")
+        self.p2_stones_label.config(text="")
+        self.info_label.config(text="")
+        self.submit_button.config(state="disabled")
+
+    def game_over_check(self):
+        if self.tagad_stavoklis.akmenuSk <=0:
+            self.stones_label.config(text=f"Gala punkti:")
+            self.p1_stones_label.config(text=f"Spēlētāja punkti: {self.speletaja_punkti}")
+            self.p2_stones_label.config(text=f"Datora punkti: {self.datora_punkti}")
+            if self.speletaja_punkti == self.datora_punkti:
+                self.info_label.config(text=f"Neizšķirts!")
+            elif self.speletaja_punkti > self.datora_punkti:
+                self.info_label.config(text=f"Uzvara!")
+            else:
+                self.info_label.config(text=f"Dators uzvar!")
+            self.submit_button.config(state="disabled")
+
+
+    def akmen_info(self, stones_left, p1_stones_taken, p2_stones_taken):
+        self.stones_label.config(text=f"Atlikuši akmeņi: {stones_left}")
+        self.p1_stones_label.config(text=f"Spēlētāja punkti: {p1_stones_taken}")
+        self.p2_stones_label.config(text=f"Datora punkti: {p2_stones_taken}")
+
+
+root = tk.Tk()
+game_gui = GameGUI(root)
+root.mainloop()
+
+
+
