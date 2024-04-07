@@ -211,10 +211,19 @@ def speletajs():
 
 
 def saks_speli():
-    izvele = input("Vai spēli sāks spēlētājs (1) vai dators (2): ").strip()
+    izvele = input("Vai spēli sāks spēlētājs (1) vai dators (2): ")
     while izvele not in ['1','2']:
         print("error")
-        izvele = input("Vai spēli sāks spēlētājs (1) vai dators (2): ").strip()
+        izvele = input("Vai spēli sāks spēlētājs (1) vai dators (2): ")
+    return izvele
+
+def algo_izvele():
+
+    print("Izvēlieties algoritmu:")
+    izvele = input("Ievadiet M (Minimax) vai A (Alfa-beta): ")
+    while izvele not in ['M', 'A']:
+        print("error")
+        izvele= input("Ievadiet M vai A: ")
     return izvele
 
 
@@ -223,6 +232,7 @@ def play():
     tagad_stavoklis = Virs('V1', akmeni, 0, 0, 0, 0, 1)
     speletaja_punkti = 0
     datora_punkti = 0 
+    algoritms=algo_izvele()
     while tagad_stavoklis.akmenuSk > 0:
 
         if uzsacejs == '1' or uzsacejs == '2' and tagad_stavoklis.akmenuSk <=0:
@@ -242,10 +252,18 @@ def play():
       
             uzsacejs = '2'
             
-        if tagad_stavoklis.akmenuSk > 0 and uzsacejs == '2':
+        if tagad_stavoklis.akmenuSk > 0 and uzsacejs == '2' and algoritms == 'M':
             dators_izvele = MiniMax(tagad_stavoklis, 1, True)[1]
             print (f"Dators paņem {dators_izvele} akmentiņus.")
             print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
+
+
+        # elif tagad_stavoklis.akmenuSk > 0 and uzsacejs == '2' and algoritms == 'A':
+          #  dators_izvele = Alfabeta()
+           # print (f"Dators paņem {dators_izvele} akmentiņus.")
+           # print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
+
+
         if dators_izvele is not None:   
             tagad_stavoklis.akmenuSk -= dators_izvele
             datora_punkti += dators_izvele
@@ -273,18 +291,7 @@ def play():
 play()
 
 
-
-#print("Izvēlieties algoritmu:")
-#izvele = input("Ievadiet M vai A: ")
-
-#if izvele == 'M':
-        # Izsauc Minimax algoritmu
-    #result = MiniMax(saknes_virsotne, dzilums, True)
-    #print("Izvēlēts Minimax algoritms.")
-#elif izvele == 'A':
-        # Izsauc Alpha-Beta algoritmu
-        
-#    print("Izvēlēts Alpha-Beta algoritms.")
+    
 
 
 
