@@ -180,7 +180,7 @@ def MiniMax(virsotne,dzilums,max_speletajs):
             if virsotne.akmenuSk >= gajiens: #pārbauda, vai ir pietiekami daudz akmeņu, lai izpilditu gājienu
 
                 #izveidots jauns spēles stāvoklis pēc gājiena
-                jauna_virsotne = Virs(0,virsotne.akmenuSk - gajiens,virsotne.p1,virsotne.a2,virsotne.p2+gajiens,virsotne.a2,virsotne.lvl+1)
+                jauna_virsotne = Virs(0,virsotne.akmenuSk - gajiens,virsotne.p1,virsotne.a1,virsotne.p2,virsotne.a2,virsotne.lvl+1)
                 #rekursivi izsauc funkciju ar jauno spēles stāvokli, parsledzoties uz min speletaju un samazinot dziļuma ierobežojumu
                 vertiba = MiniMax(jauna_virsotne, dzilums - 1,False)[0]
                 #atjaunina maksimalo novertējumu un labako gajienu, ja ir atrasta labāka vērtība
@@ -194,7 +194,7 @@ def MiniMax(virsotne,dzilums,max_speletajs):
         minNovert = float('inf')
         for gajiens in [2,3]:
             if virsotne.akmenuSk >= gajiens:
-                jauna_virsotne = Virs(0,virsotne.akmenuSk - gajiens,virsotne.p1,virsotne.a2,virsotne.p2+gajiens,virsotne.a2,virsotne.lvl+1)
+                jauna_virsotne = Virs(0,virsotne.akmenuSk - gajiens,virsotne.p1,virsotne.a1,virsotne.p2,virsotne.a2,virsotne.lvl+1)
                
                 vertiba = MiniMax(jauna_virsotne,dzilums-1,True)[0]
                 if vertiba < minNovert:
