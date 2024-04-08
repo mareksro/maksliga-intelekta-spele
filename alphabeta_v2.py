@@ -6,6 +6,8 @@ def AlphaBeta(akmentini, punkti, max_speletajs, alpha, beta):
 
     if max_speletajs:
         maxNovert = float('-inf')
+        alpha = float('-inf')
+        beta = float('inf')
         labakais_gaj = None
         for gajiens in [2,3]:
             if akmentini >= gajiens:
