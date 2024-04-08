@@ -201,7 +201,7 @@ def MiniMax(virsotne,dzilums,max_speletajs):
                     labakais_gajiens= gajiens
         #atgriež minimālo novērtējumu, tiek atgriezta 0, jo nav nepieciešama labākā gājiena atgriešana
         return minNovert, 0
-    
+#funkcija ļauj spēlētājam izvēlēties, cik akmentiņus ņemt    
 def speletajs():
     #izvēles ievade, kur spēlētājs izvēlās paņemt 2 vai 3 akmentiņus. tas tiek saglabats mainīgajā 'izv'
     izv = input("Izvēlies paņemt 2 vai 3 akmentiņus: ")
