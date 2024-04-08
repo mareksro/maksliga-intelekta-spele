@@ -302,15 +302,8 @@ class GameGUI:
             self.label.config(text="Ievadiet pareizo akmeņu skaitu.")
 
     def play_move(self,move):
-            if move == 2:
-                self.spel_izvele = 2
-            elif move == 3:
-                self.spel_izvele = 3
-            else:
-                self.stones_to_take_label.config(text="Ievadiet pareizo akmeņu skaitu.")
-                return
-            self.tagad_stavoklis.akmenuSk -= self.spel_izvele
-            self.speletaja_punkti += self.spel_izvele
+            self.tagad_stavoklis.akmenuSk -= move
+            self.speletaja_punkti += move
             if self.tagad_stavoklis.akmenuSk % 2 == 0:
                 self.speletaja_punkti += 2
             else:
@@ -321,6 +314,8 @@ class GameGUI:
     def comp_move(self):
             if self.algoritms == 'M':
                 self.dators_izvele = MiniMax(self.tagad_stavoklis, 1, True)[1]
+
+
             elif self.algoritms == 'A':
                 dators_izvele = AlfaBeta()
 
@@ -333,6 +328,7 @@ class GameGUI:
                     self.datora_punkti -=2
                 self.akmen_info(self.tagad_stavoklis.akmenuSk,self.speletaja_punkti, self.datora_punkti)
                 self.game_over_check()
+
 
     def new_game(self):
         self.label.config(text="Izvēlieties akmeņu skaitu (no 50 līdz 70):")
