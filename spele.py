@@ -201,6 +201,14 @@ def MiniMax(virsotne,dzilums,max_speletajs):
                     labakais_gajiens= gajiens
         #atgriež minimālo novērtējumu, tiek atgriezta 0, jo nav nepieciešama labākā gājiena atgriešana
         return minNovert, 0
+        
+#########################################
+# def AlphaBetaDriver inicializē alpha un beta vērtības, lai tās netiktu atkārtotas ik reizi, kad tiek izsaukta AlphaBeta() funkcija
+
+def AlphaBetaDriver(virsotne, dzilums, max_speletajs): 
+    alpha = float('-inf')
+    beta = float('inf')
+    return AlphaBeta(virsotne, dzilums, alpha, beta, max_speletajs)
 
 def AlphaBeta(virsotne, dzilums, alpha, beta, max_speletajs):
     if virsotne.akmenuSk == 0 or dzilums == 0:
@@ -216,8 +224,8 @@ def AlphaBeta(virsotne, dzilums, alpha, beta, max_speletajs):
                 if vertiba > maxNovert:
                     maxNovert = vertiba
                     labakais_gajiens = gajiens
-                alpha = max(alpha, vertiba)
-                if beta <= alpha:
+                alpha = max(alpha, vertiba) # Jaunā Alpha tiek izvēlēta starp pašreizējo alpha vērtību, vai izvēlēto alpha vērtību
+                if beta <= alpha: # Alpha nekad nevar būt mazāks par beta
                     break
         return maxNovert, labakais_gajiens
     else:
@@ -228,11 +236,12 @@ def AlphaBeta(virsotne, dzilums, alpha, beta, max_speletajs):
                 vertiba = AlphaBeta(jauna_virsotne, dzilums - 1, alpha, beta, True)[0]
                 if vertiba < minNovert:
                     minNovert = vertiba
-                beta = min(beta, vertiba)
-                if beta <= alpha:
+                beta = min(beta, vertiba) # Jaunā Beta tiek izvēlēta starp pašreizējo beta vērtību, vai izvēlēto beta vērtību
+                if beta <= alpha: # Alpha nekad nevar būt mazāks par beta
                     break
         return minNovert, 0
 
+###################################
 
 #funkcija ļauj spēlētājam izvēlēties, cik akmentiņus ņemt    
 def speletajs():
