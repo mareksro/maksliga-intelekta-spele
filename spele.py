@@ -201,6 +201,39 @@ def MiniMax(virsotne,dzilums,max_speletajs):
                     labakais_gajiens= gajiens
         #atgriež minimālo novērtējumu, tiek atgriezta 0, jo nav nepieciešama labākā gājiena atgriešana
         return minNovert, 0
+
+def AlphaBeta(virsotne, dzilums, alpha, beta, max_speletajs):
+    if virsotne.akmenuSk == 0 or dzilums == 0:
+        return virsotne.p1 - virsotne.p2, None
+
+    if max_speletajs:
+        maxNovert = float('-inf')
+        labakais_gajiens = None
+        for gajiens in [2,3]:
+            if virsotne.akmenuSk >= gajiens:
+                jauna_virsotne = Virs(0,virsotne.akmenuSk ,virsotne.p1,virsotne.a1,virsotne.p2,virsotne.a2,virsotne.lvl+1)
+                vertiba = AlphaBeta(jauna_virsotne, dzilums - 1, alpha, beta, False)[0]
+                if vertiba > maxNovert:
+                    maxNovert = vertiba
+                    labakais_gajiens = gajiens
+                alpha = max(alpha, vertiba)
+                if beta <= alpha:
+                    break
+        return maxNovert, labakais_gajiens
+    else:
+        minNovert = float('inf')
+        for gajiens in [2,3]:
+            if virsotne.akmenuSk >= gajiens:
+                jauna_virsotne = Virs(0,virsotne.akmenuSk,virsotne.p1,virsotne.a1,virsotne.p2,virsotne.a2,virsotne.lvl+1)
+                vertiba = AlphaBeta(jauna_virsotne, dzilums - 1, alpha, beta, True)[0]
+                if vertiba < minNovert:
+                    minNovert = vertiba
+                beta = min(beta, vertiba)
+                if beta <= alpha:
+                    break
+        return minNovert, 0
+
+
 #funkcija ļauj spēlētājam izvēlēties, cik akmentiņus ņemt    
 def speletajs():
     #izvēles ievade, kur spēlētājs izvēlās paņemt 2 vai 3 akmentiņus. tas tiek saglabats mainīgajā 'izv'
