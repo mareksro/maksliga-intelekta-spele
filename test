@@ -276,7 +276,7 @@ class GameGUI:
             self.speletaja_punkti = 0
             self.datora_punkti = 0
             self.algoritms= self.algo_izvele.get()
-            if self.tagad_stavoklis.akmenuSk > 0 and self.uzsacejs == '2' and self.algoritms == 'M':
+            if self.uzsacejs == '2':
                 self.comp_move()
                 self.button2.config(state="normal")
                 self.button3.config(state="normal")
@@ -300,15 +300,11 @@ class GameGUI:
     def comp_move(self):
         if self.algoritms == 'M':
             self.dators_izvele = MiniMax(self.tagad_stavoklis, 10, True)[1]
-
         elif self.algoritms == 'A':
             self.dators_izvele = AlphaBetaInit(self.tagad_stavoklis, 10, True)[1]
-        if  self.tagad_stavoklis.akmenuSk>0:
-            try:
-                self.dators_izvele=int(self.dators_izvele)
-            except ValueError:
-                self.label.config(text="")
-        else:
+        try:
+            self.dators_izvele=int(self.dators_izvele)
+        except ValueError and TypeError:
             return
         if self.dators_izvele is not None:
             self.tagad_stavoklis.akmenuSk -= self.dators_izvele
@@ -333,7 +329,7 @@ class GameGUI:
         self.akmen_inf.config(text=f"Atlikuši akmeņi: {self.tagad_stavoklis.akmenuSk}")
         self.playp.config(text=f"Spēlētāja punkti: {self.speletaja_punkti}")
         self.datorp.config(text=f"Datora punkti: {self.datora_punkti}")
-        if self.tagad_stavoklis.akmenuSk <=0:
+        if self.tagad_stavoklis.akmenuSk <=1:
             if self.speletaja_punkti == self.datora_punkti:
                 self.akmen_inf.config(text=f"Neizšķirts!",fg="seashell4")
             elif self.speletaja_punkti > self.datora_punkti:
