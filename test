@@ -255,12 +255,13 @@ class GameGUI:
         self.stones_to_take_label = tk.Label(master, text="Izvēlieties ņemamo akmeņu skaitu:")
         self.stones_to_take_label.pack()
 
-        self.akmen_entry = tk.Entry(master)
-        self.akmen_entry.pack()
+        self.button2 = tk.Button( text="2 akmeņi", command=lambda: self.play_move(2))
+        self.button2.pack()
+        self.button2.config(state="disabled")
 
-        self.submit_button = tk.Button(master, text="Submit", command=self.play_move)
-        self.submit_button.pack()
-        self.submit_button.config(state="disabled")
+        self.button3 = tk.Button( text="3 akmeņi", command=lambda: self.play_move(3))
+        self.button3.pack()
+        self.button3.config(state="disabled")
 
         self.algorithm_label = tk.Label(master, text="Izvēlieties algoritmu:")
         self.algorithm_label.pack()
@@ -292,17 +293,18 @@ class GameGUI:
             self.algoritms= self.algorithm_selection.get()
             if self.tagad_stavoklis.akmenuSk > 0 and self.uzsacejs == '2' and self.algoritms == 'M':
                 self.comp_move()
+                self.button2.config(state="normal")
+                self.button3.config(state="normal")
             else:
-                self.submit_button.config(state="normal")
+                self.button2.config(state="normal")
+                self.button3.config(state="normal")
         except ValueError:
             self.label.config(text="Ievadiet pareizo akmeņu skaitu.")
 
-    def play_move(self):
-        try:
-            self.akmensk=int(self.akmen_entry.get())
-            if self.akmensk == 2:
+    def play_move(self,move):
+            if move == 2:
                 self.spel_izvele = 2
-            elif self.akmensk == 3:
+            elif move == 3:
                 self.spel_izvele = 3
             else:
                 self.stones_to_take_label.config(text="Ievadiet pareizo akmeņu skaitu.")
@@ -313,11 +315,8 @@ class GameGUI:
                 self.speletaja_punkti += 2
             else:
                 self.speletaja_punkti -= 2
-            self.akmen_entry.delete(0, tk.END)
             self.game_over_check()
             self.comp_move()
-        except ValueError:
-            self.stones_to_take_label.config(text="Ievadiet pareizo akmeņu skaitu.")
 
     def comp_move(self):
             if self.algoritms == 'M':
@@ -338,12 +337,12 @@ class GameGUI:
     def new_game(self):
         self.label.config(text="Izvēlieties akmeņu skaitu (no 50 līdz 70):")
         self.stones_entry.delete(0, tk.END)
-        self.akmen_entry.delete(0, tk.END)
         self.stones_label.config(text="")
         self.p1_stones_label.config(text="")
         self.p2_stones_label.config(text="")
         self.info_label.config(text="")
-        self.submit_button.config(state="disabled")
+        self.button2.config(state="disabled")
+        self.button3.config(state="disabled")
 
     def game_over_check(self):
         if self.tagad_stavoklis.akmenuSk <=0:
@@ -356,7 +355,8 @@ class GameGUI:
                 self.info_label.config(text=f"Uzvara!")
             else:
                 self.info_label.config(text=f"Dators uzvar!")
-            self.submit_button.config(state="disabled")
+            self.button2.config(state="disabled")
+            self.button3.config(state="disabled")
 
 
     def akmen_info(self, stones_left, p1_stones_taken, p2_stones_taken):
