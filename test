@@ -113,55 +113,61 @@ def gajiens(gTips, genVirs, pasrV):
             spele.piev_loku(pasrV[0], spele.virsotnes[k].id)
 
 ###############################
-def is_terminal(node):
-    # Spele beidzas kad akmenu vairs nav
-    return node.akmeni == 0
 
-def static_evaluation(node):
-    # Spēlētāja iegūto akmeņu skaits tiek pievienots spēlētāja rezultātam.
-    # Ja pēc akmeņu ņemšanas uz galda ir palicis pāra skaits akmeņu,
-    # tad spēlētāja rezultātam tiek pievienoti 2 punkti, un, ja ir nepāra skaitlis,
-    # tad tiek atskaitīti 2 punkti.
-    if node.akmeni % 2 == 0:
-        node.speletaja_punkti += 2
+# Kods ir izveidots pēc minimax.py parauga, izņemot šoreiz ir divi citi mainīgie - alpha un beta
+
+def AlphaBeta(akmentini, punkti, max_speletajs, alpha, beta):
+    if akmentini == 0:
+        return punkti, 0
+
+    if max_speletajs:
+        maxNovert = float('-inf')
+        alpha = float('-inf')
+        beta = float('inf')
+        labakais_gaj = None
+        for gajiens in [2,3]:
+            if akmentini >= gajiens:
+                atlikusie_akmentini = akmentini - gajiens
+                punkti_jaunie = punkti + gajiens
+
+                if atlikusie_akmentini % 2 == 0:
+                    punkti_jaunie += 2
+                else:
+                    punkti_jaunie -= 2
+
+                novertejums = AlphaBeta(atlikusie_akmentini, punkti_jaunie, False, alpha, beta)[0]
+                if novertejums > maxNovert:
+                    maxNovert = novertejums
+                    labakais_gaj = gajiens
+
+                alpha = max(alpha, novertejums)
+                if beta <= alpha:
+                    break
+
+        return maxNovert, labakais_gaj
     else:
-        node.speletaja_punkti -= 2
+        minNovert = float('inf')
+        labakais_gaj = None
+        for gajiens in [2,3]:
+            if akmentini >= gajiens:
+                atlikusie_akmentini = akmentini - gajiens
+                punkti_jaunie = punkti + gajiens
 
-    node.speletaja_punkti += node.stones_taken
+                if atlikusie_akmentini % 2 == 0:
+                    punkti_jaunie += 2
+                else:
+                    punkti_jaunie -= 2
 
-    # Ja spēlētājiem ir vienāds punktu skaits, rezultāts ir neizšķirts.
-    # Pretējā gadījumā uzvar spēlētājs, kuram ir vairāk punktu.
-    if node.speletaja_punkti == node.pretinieka_punkti:
-        return 0  # Neizskirts
-    elif node.speletaja_punkti > node.pretinieka_punkti:
-        return 1  # Speletajs uzvar
-    else:
-        return -1  # Dators uzvar
+                novertejums = AlphaBeta(atlikusie_akmentini, punkti_jaunie, True, alpha, beta)[0]
+                if novertejums < minNovert:
+                    minNovert = novertejums
+                    labakais_gaj = gajiens
 
-def AlfaBeta(node, depth, alpha, beta, maximizingPlayer):
-    if depth == 0 or is_terminal(node):
-        return static_evaluation(node)
+                beta = min(beta, novertejums)
+                if beta <= alpha:
+                    break
 
-    if maximizingPlayer:
-        maxEva = float('-inf')
-        for child in node.children():
-            eva = AlfaBeta(child, depth-1, alpha, beta, False)
-            maxEva = max(maxEva, eva)
-            alpha = max(alpha, eva)
-            if beta <= alpha:
-                break
-        return maxEva
-
-    else:
-        minEva = float('inf')
-        for child in node.children():
-            eva = AlfaBeta(child, depth-1, alpha, beta, True)
-            minEva = min(minEva, eva)
-            beta = min(beta, eva)
-            if beta <= alpha:
-                break
-        return minEva
-
+        return minNovert, labakais_gaj
 ################################
 # funkcija tiek definēta:
 #virsotne - speles stāvoklis
@@ -217,8 +223,8 @@ class GameGUI:
         self.label = tk.Label(master, text="Laipni lūdzam spēlē! Izvēlieties akmeņu skaitu no 50 līdz 70")
         self.label.pack()
 
-        self.stones_entry = tk.Entry(master)
-        self.stones_entry.pack()
+        self.akmen_entry = tk.Entry(master)
+        self.akmen_entry.pack()
 
         self.start_button = tk.Button(master, text="Sākt spēli", command=self.play)
         self.start_button.pack()
@@ -226,34 +232,31 @@ class GameGUI:
         self.new_game_button = tk.Button(master, text="Jauna spēle", command=self.new_game)
         self.new_game_button.pack()
 
-        self.start_player_label = tk.Label(master, text="Izvēlieties, kurš sāks spēli:")
-        self.start_player_label.pack()
+        self.saks_speli = tk.Label(master, text="Izvēlieties, kurš sāks spēli:")
+        self.saks_speli.pack()
 
         self.stav = tk.StringVar(value='1')
 
-        self.user_radio = tk.Radiobutton(master, text="Lietotājs", variable=self.stav, value='1')
-        self.user_radio.pack()
+        self.play_radio = tk.Radiobutton(master, text="Lietotājs", variable=self.stav, value='1')
+        self.play_radio.pack()
 
-        self.computer_radio = tk.Radiobutton(master, text="Dators", variable=self.stav, value='2')
-        self.computer_radio.pack()
+        self.comp_radio = tk.Radiobutton(master, text="Dators", variable=self.stav, value='2')
+        self.comp_radio.pack()
 
-        self.info_label = tk.Label(master, text="")
-        self.info_label.pack()
+        self.info = tk.Label(master, text="")
+        self.info.pack()
 
-        self.stones_label = tk.Label(master, text="")
-        self.stones_label.pack()
+        self.akmen_inf = tk.Label(master, text="")
+        self.akmen_inf.pack()
 
-        self.p1_stones_label = tk.Label(master, text="")
-        self.p1_stones_label.pack()
+        self.playp = tk.Label(master, text="")
+        self.playp.pack()
 
-        self.p2_stones_label = tk.Label(master, text="")
-        self.p2_stones_label.pack()
+        self.datorp = tk.Label(master, text="")
+        self.datorp.pack()
 
-        self.game_started = False
-        self.koks = Koks()
-
-        self.stones_to_take_label = tk.Label(master, text="Izvēlieties ņemamo akmeņu skaitu:")
-        self.stones_to_take_label.pack()
+        self.akmen_izvele = tk.Label(master, text="Izvēlieties ņemamo akmeņu skaitu:")
+        self.akmen_izvele.pack()
 
         self.button2 = tk.Button( text="2 akmeņi", command=lambda: self.play_move(2))
         self.button2.pack()
@@ -263,26 +266,21 @@ class GameGUI:
         self.button3.pack()
         self.button3.config(state="disabled")
 
-        self.algorithm_label = tk.Label(master, text="Izvēlieties algoritmu:")
-        self.algorithm_label.pack()
+        self.algo_label = tk.Label(master, text="Izvēlieties algoritmu:")
+        self.algo_label.pack()
 
-        self.algorithm_selection = tk.StringVar(value='M')
+        self.algo_izvele = tk.StringVar(value='M')
 
-        self.minimax_radio = tk.Radiobutton(master, text="MiniMax", variable=self.algorithm_selection, value='M')
+        self.minimax_radio = tk.Radiobutton(master, text="MiniMax", variable=self.algo_izvele, value='M')
         self.minimax_radio.pack()
 
-        self.alphabeta_radio = tk.Radiobutton(master, text="Alpha-Beta", variable=self.algorithm_selection, value='A')
+        self.alphabeta_radio = tk.Radiobutton(master, text="Alpha-Beta", variable=self.algo_izvele, value='A')
         self.alphabeta_radio.pack()
-
 
     def play(self):
         self.label.config(text="Spēle sākusies")
-        self.stones_label.config(text="")
-        self.p1_stones_label.config(text="")
-        self.p2_stones_label.config(text="")
-        self.info_label.config(text="")
         try:
-            self.akmeni = int(self.stones_entry.get())
+            self.akmeni = int(self.akmen_entry.get())
             if self.akmeni>70 or self.akmeni<50:
                 self.label.config(text="!Izvēlieties akmeņu skaitu no 50 līdz 70!")
                 return
@@ -290,7 +288,7 @@ class GameGUI:
             self.tagad_stavoklis = Virs('V1', self.akmeni, 0, 0, 0, 0, 1)
             self.speletaja_punkti = 0
             self.datora_punkti = 0
-            self.algoritms= self.algorithm_selection.get()
+            self.algoritms= self.algo_izvele.get()
             if self.tagad_stavoklis.akmenuSk > 0 and self.uzsacejs == '2' and self.algoritms == 'M':
                 self.comp_move()
                 self.button2.config(state="normal")
@@ -300,6 +298,7 @@ class GameGUI:
                 self.button3.config(state="normal")
         except ValueError:
             self.label.config(text="Ievadiet pareizo akmeņu skaitu.")
+        self.start_button.config(state="disabled")
 
     def play_move(self,move):
             self.tagad_stavoklis.akmenuSk -= move
@@ -317,7 +316,7 @@ class GameGUI:
 
 
             elif self.algoritms == 'A':
-                dators_izvele = AlfaBeta()
+                dators_izvele = AlphaBeta(self.tagad_stavoklis.akmenuSk,self.datora_punkti,True)
 
             if self.dators_izvele is not None:
                 self.tagad_stavoklis.akmenuSk -= self.dators_izvele
@@ -326,40 +325,33 @@ class GameGUI:
                     self.datora_punkti += 2
                 else:
                     self.datora_punkti -=2
-                self.akmen_info(self.tagad_stavoklis.akmenuSk,self.speletaja_punkti, self.datora_punkti)
                 self.game_over_check()
-
 
     def new_game(self):
         self.label.config(text="Izvēlieties akmeņu skaitu (no 50 līdz 70):")
-        self.stones_entry.delete(0, tk.END)
-        self.stones_label.config(text="")
-        self.p1_stones_label.config(text="")
-        self.p2_stones_label.config(text="")
-        self.info_label.config(text="")
+        self.akmen_entry.delete(0, tk.END)
+        self.akmen_inf.config(text="")
+        self.playp.config(text="")
+        self.datorp.config(text="")
+        self.info.config(text="")
         self.button2.config(state="disabled")
         self.button3.config(state="disabled")
+        self.start_button.config(state="normal")
 
     def game_over_check(self):
+        self.akmen_inf.config(text=f"Atlikuši akmeņi: {self.tagad_stavoklis.akmenuSk}")
+        self.playp.config(text=f"Spēlētāja punkti: {self.speletaja_punkti}")
+        self.datorp.config(text=f"Datora punkti: {self.datora_punkti}")
         if self.tagad_stavoklis.akmenuSk <=0:
-            self.stones_label.config(text=f"Gala punkti:")
-            self.p1_stones_label.config(text=f"Spēlētāja punkti: {self.speletaja_punkti}")
-            self.p2_stones_label.config(text=f"Datora punkti: {self.datora_punkti}")
+            self.akmen_inf.config(text=f"Gala punkti:")
             if self.speletaja_punkti == self.datora_punkti:
-                self.info_label.config(text=f"Neizšķirts!")
+                self.info.config(text=f"Neizšķirts!")
             elif self.speletaja_punkti > self.datora_punkti:
-                self.info_label.config(text=f"Uzvara!")
+                self.info.config(text=f"Uzvara!")
             else:
-                self.info_label.config(text=f"Dators uzvar!")
+                self.info.config(text=f"Dators uzvar!")
             self.button2.config(state="disabled")
             self.button3.config(state="disabled")
-
-
-    def akmen_info(self, stones_left, p1_stones_taken, p2_stones_taken):
-        self.stones_label.config(text=f"Atlikuši akmeņi: {stones_left}")
-        self.p1_stones_label.config(text=f"Spēlētāja punkti: {p1_stones_taken}")
-        self.p2_stones_label.config(text=f"Datora punkti: {p2_stones_taken}")
-
 
 root = tk.Tk()
 game_gui = GameGUI(root)
