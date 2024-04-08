@@ -246,7 +246,7 @@ class GameGUI:
         self.info = tk.Label()
         self.info.pack()
 
-        self.akmen_inf = tk.Label(text="")
+        self.akmen_inf = tk.Label(text="",fg="black",font=('arial',12,'bold'))
         self.akmen_inf.pack()
 
         self.playp = tk.Label(text="")
@@ -317,7 +317,6 @@ class GameGUI:
         if self.algoritms == 'M':
             self.dators_izvele = MiniMax(self.tagad_stavoklis, 10, True)[1]
 
-
         elif self.algoritms == 'A':
             dators_izvele = AlphaBeta(self.tagad_stavoklis.akmenuSk,self.datora_punkti,True)
 
@@ -333,7 +332,7 @@ class GameGUI:
     def new_game(self):
         self.label.config(text="Izvēlieties akmeņu skaitu (no 50 līdz 70):")
         self.akmen_entry.delete(0, tk.END)
-        self.akmen_inf.config(text="")
+        self.akmen_inf.config(text="",fg="black")
         self.playp.config(text="")
         self.datorp.config(text="")
         self.button2.config(state="disabled")
@@ -346,12 +345,12 @@ class GameGUI:
         self.datorp.config(text=f"Datora punkti: {self.datora_punkti}")
         if self.tagad_stavoklis.akmenuSk <=0:
             if self.speletaja_punkti == self.datora_punkti:
-                self.akmen_inf.config(text=f"Neizšķirts!",fg="seashell4",font=(10))
+                self.akmen_inf.config(text=f"Neizšķirts!",fg="seashell4")
             elif self.speletaja_punkti > self.datora_punkti:
-                self.akmen_inf.config(text=f"Uzvara!",fg="lime green",font=(10))
+                self.akmen_inf.config(text=f"Uzvara!",fg="lime green")
                 self.playp.config(text=f"Spēlētāja punkti: {self.speletaja_punkti}")
             else:
-                self.akmen_inf.config(text=f"Dators uzvar!",fg="maroon",font=(10))
+                self.akmen_inf.config(text=f"Dators uzvar!",fg="maroon")
             self.button2.config(state="disabled")
             self.button3.config(state="disabled")
 
