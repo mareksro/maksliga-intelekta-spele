@@ -220,61 +220,64 @@ class GameGUI:
         self.master.title("Spēle ar akmeņiem")
         master.geometry("400x400")
 
-        self.label = tk.Label(master, text="Laipni lūdzam spēlē! Izvēlieties akmeņu skaitu no 50 līdz 70")
+        self.label = tk.Label(text="Laipni lūdzam spēlē! Izvēlieties akmeņu skaitu no 50 līdz 70")
         self.label.pack()
 
-        self.akmen_entry = tk.Entry(master)
+        self.akmen_entry = tk.Entry()
         self.akmen_entry.pack()
 
-        self.start_button = tk.Button(master, text="Sākt spēli", command=self.play)
+        self.start_button = tk.Button(text="Sākt spēli", command=self.play)
         self.start_button.pack()
 
-        self.new_game_button = tk.Button(master, text="Jauna spēle", command=self.new_game)
+        self.new_game_button = tk.Button(text="Jauna spēle", command=self.new_game)
         self.new_game_button.pack()
 
-        self.saks_speli = tk.Label(master, text="Izvēlieties, kurš sāks spēli:")
+        self.saks_speli = tk.Label(text="Izvēlieties, kurš sāks spēli:")
         self.saks_speli.pack()
 
         self.stav = tk.StringVar(value='1')
 
-        self.play_radio = tk.Radiobutton(master, text="Lietotājs", variable=self.stav, value='1')
+        self.play_radio = tk.Radiobutton(text="Lietotājs", variable=self.stav, value='1')
         self.play_radio.pack()
 
-        self.comp_radio = tk.Radiobutton(master, text="Dators", variable=self.stav, value='2')
+        self.comp_radio = tk.Radiobutton(text="Dators", variable=self.stav, value='2')
         self.comp_radio.pack()
 
-        self.info = tk.Label(master, text="")
+        self.info = tk.Label()
         self.info.pack()
-
-        self.akmen_inf = tk.Label(master, text="")
+        
+        self.akmen_inf = tk.Label(text="")
         self.akmen_inf.pack()
 
-        self.playp = tk.Label(master, text="")
+        self.playp = tk.Label(text="")
         self.playp.pack()
 
-        self.datorp = tk.Label(master, text="")
+        self.datorp = tk.Label(text="")
         self.datorp.pack()
 
-        self.akmen_izvele = tk.Label(master, text="Izvēlieties ņemamo akmeņu skaitu:")
+        self.akmen_izvele = tk.Label(text="Izvēlieties ņemamo akmeņu skaitu:")
         self.akmen_izvele.pack()
 
-        self.button2 = tk.Button( text="2 akmeņi", command=lambda: self.play_move(2))
-        self.button2.pack()
+        self.akmen_izvele_frame = tk.Frame()
+        self.akmen_izvele_frame.pack()
+
+        self.button2 = tk.Button(self.akmen_izvele_frame, text="2 akmeņi", command=lambda: self.play_move(2))
+        self.button2.pack(side='left')
         self.button2.config(state="disabled")
 
-        self.button3 = tk.Button( text="3 akmeņi", command=lambda: self.play_move(3))
-        self.button3.pack()
+        self.button3 = tk.Button(self.akmen_izvele_frame, text="3 akmeņi", command=lambda: self.play_move(3))
+        self.button3.pack(side='right')
         self.button3.config(state="disabled")
 
-        self.algo_label = tk.Label(master, text="Izvēlieties algoritmu:")
+        self.algo_label = tk.Label(text="Izvēlieties algoritmu:")
         self.algo_label.pack()
 
         self.algo_izvele = tk.StringVar(value='M')
 
-        self.minimax_radio = tk.Radiobutton(master, text="MiniMax", variable=self.algo_izvele, value='M')
+        self.minimax_radio = tk.Radiobutton(text="MiniMax", variable=self.algo_izvele, value='M')
         self.minimax_radio.pack()
 
-        self.alphabeta_radio = tk.Radiobutton(master, text="Alpha-Beta", variable=self.algo_izvele, value='A')
+        self.alphabeta_radio = tk.Radiobutton(text="Alpha-Beta", variable=self.algo_izvele, value='A')
         self.alphabeta_radio.pack()
 
     def play(self):
@@ -301,31 +304,31 @@ class GameGUI:
         self.start_button.config(state="disabled")
 
     def play_move(self,move):
-            self.tagad_stavoklis.akmenuSk -= move
-            self.speletaja_punkti += move
-            if self.tagad_stavoklis.akmenuSk % 2 == 0:
-                self.speletaja_punkti += 2
-            else:
-                self.speletaja_punkti -= 2
-            self.game_over_check()
-            self.comp_move()
+        self.tagad_stavoklis.akmenuSk -= move
+        self.speletaja_punkti += move
+        if self.tagad_stavoklis.akmenuSk % 2 == 0:
+            self.speletaja_punkti += 2
+        else:
+            self.speletaja_punkti -= 2
+        self.game_over_check()
+        self.comp_move()
 
     def comp_move(self):
-            if self.algoritms == 'M':
-                self.dators_izvele = MiniMax(self.tagad_stavoklis, 10, True)[1]
+        if self.algoritms == 'M':
+            self.dators_izvele = MiniMax(self.tagad_stavoklis, 1, True)[1]
 
 
-            elif self.algoritms == 'A':
-                dators_izvele = AlphaBeta(self.tagad_stavoklis.akmenuSk,self.datora_punkti,True)
+        elif self.algoritms == 'A':
+            dators_izvele = AlphaBeta(self.tagad_stavoklis.akmenuSk,self.datora_punkti,True)
 
-            if self.dators_izvele is not None:
-                self.tagad_stavoklis.akmenuSk -= self.dators_izvele
-                self.datora_punkti += self.dators_izvele
-                if self.tagad_stavoklis.akmenuSk % 2 == 0:
-                    self.datora_punkti += 2
-                else:
-                    self.datora_punkti -=2
-                self.game_over_check()
+        if self.dators_izvele is not None:
+            self.tagad_stavoklis.akmenuSk -= self.dators_izvele
+            self.datora_punkti += self.dators_izvele
+            if self.tagad_stavoklis.akmenuSk % 2 == 0:
+                self.datora_punkti += 2
+            else:
+                self.datora_punkti -=2
+            self.game_over_check()
 
     def new_game(self):
         self.label.config(text="Izvēlieties akmeņu skaitu (no 50 līdz 70):")
@@ -333,7 +336,6 @@ class GameGUI:
         self.akmen_inf.config(text="")
         self.playp.config(text="")
         self.datorp.config(text="")
-        self.info.config(text="")
         self.button2.config(state="disabled")
         self.button3.config(state="disabled")
         self.start_button.config(state="normal")
@@ -343,19 +345,16 @@ class GameGUI:
         self.playp.config(text=f"Spēlētāja punkti: {self.speletaja_punkti}")
         self.datorp.config(text=f"Datora punkti: {self.datora_punkti}")
         if self.tagad_stavoklis.akmenuSk <=0:
-            self.akmen_inf.config(text=f"Gala punkti:")
             if self.speletaja_punkti == self.datora_punkti:
-                self.info.config(text=f"Neizšķirts!")
+                self.akmen_inf.config(text=f"Neizšķirts!",fg="seashell4",font=(10))
             elif self.speletaja_punkti > self.datora_punkti:
-                self.info.config(text=f"Uzvara!")
+                self.akmen_inf.config(text=f"Uzvara!",fg="lime green",font=(10))
+                self.playp.config(text=f"Spēlētāja punkti: {self.speletaja_punkti}")
             else:
-                self.info.config(text=f"Dators uzvar!")
+                self.akmen_inf.config(text=f"Dators uzvar!",fg="maroon",font=(10))
             self.button2.config(state="disabled")
             self.button3.config(state="disabled")
 
 root = tk.Tk()
 game_gui = GameGUI(root)
 root.mainloop()
-
-
-
