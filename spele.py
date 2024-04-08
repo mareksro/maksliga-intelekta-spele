@@ -158,18 +158,15 @@ for x, y in spele.loki.items():
 
 ################################
     # funkcija tiek definēta:
-    #virsotne - speles stāvoklis
+    #virsotne - pašreizējais speles stāvoklis
     #max_speletajs - norada, vai ir maksimizejosais speletajs
-    #dzilums_robeza - rekursijas dziluma ierobezojums
+    #dzilums - gājienu dziļums
 def MiniMax(virsotne,dzilums,max_speletajs):
 
-    #parbaude vai uz galda nav akmentiņu vai ir sasniegs dziluma ierobezojums
+    #parbaude vai uz galda nav akmentiņu vai ir sasniegts dziluma ierobezojums
     if virsotne.akmenuSk == 0 or dzilums == 0:
 
         return virsotne.p1 - virsotne.p2, None
-        
-        
-    
     #ja tagadējais spēlētājs ir max, tiek inicializēts mainīgais maxNovert ar negatīvu bezgalību, lai nākamā novērtējuma vērtība būtu lielāka
     if max_speletajs:
         maxNovert= float('-inf')
@@ -180,7 +177,7 @@ def MiniMax(virsotne,dzilums,max_speletajs):
             if virsotne.akmenuSk >= gajiens: #pārbauda, vai ir pietiekami daudz akmeņu, lai izpilditu gājienu
 
                 #izveidots jauns spēles stāvoklis pēc gājiena
-                jauna_virsotne = Virs(0,virsotne.akmenuSk - gajiens,virsotne.p1,virsotne.a1,virsotne.p2,virsotne.a2,virsotne.lvl+1)
+                jauna_virsotne = Virs(0,virsotne.akmenuSk ,virsotne.p1,virsotne.a1,virsotne.p2,virsotne.a2,virsotne.lvl+1)
                 #rekursivi izsauc funkciju ar jauno spēles stāvokli, parsledzoties uz min speletaju un samazinot dziļuma ierobežojumu
                 vertiba = MiniMax(jauna_virsotne, dzilums - 1,False)[0]
                 #atjaunina maksimalo novertējumu un labako gajienu, ja ir atrasta labāka vērtība
@@ -191,69 +188,95 @@ def MiniMax(virsotne,dzilums,max_speletajs):
         return maxNovert, labakais_gajiens
 
     else: #gājienu veic minimizējošais spēlētājs ar līdzīgu algoritmu, mēģinot minimizēt punktu skaitu
-        minNovert = float('inf')
+        minNovert = float('inf')#sākotnējā vērtība ir +bezgalība
+        #līdzigs cikls kā maksimizējošam spēlētājam
         for gajiens in [2,3]:
             if virsotne.akmenuSk >= gajiens:
-                jauna_virsotne = Virs(0,virsotne.akmenuSk - gajiens,virsotne.p1,virsotne.a1,virsotne.p2,virsotne.a2,virsotne.lvl+1)
+                jauna_virsotne = Virs(0,virsotne.akmenuSk,virsotne.p1,virsotne.a1,virsotne.p2,virsotne.a2,virsotne.lvl+1)
                
                 vertiba = MiniMax(jauna_virsotne,dzilums-1,True)[0]
+                #atjaunina minimālo novērtējumu,ja ir atrasta mazākā vērtība
                 if vertiba < minNovert:
                     minNovert = vertiba
                     labakais_gajiens= gajiens
+        #atgriež minimālo novērtējumu, tiek atgriezta 0, jo nav nepieciešama labākā gājiena atgriešana
         return minNovert, 0
     
 def speletajs():
+    #izvēles ievade, kur spēlētājs izvēlās paņemt 2 vai 3 akmentiņus. tas tiek saglabats mainīgajā 'izv'
     izv = input("Izvēlies paņemt 2 vai 3 akmentiņus: ")
+    #cikls pārbauda, vai ievadītā vērtība atbilst 2 vai 3. ja neatbilst,tad izvada kļūdu paziņojumu un liek atkal ievadīt vērtību
     while izv not in ['2', '3']:
         print("error")
         izv = input("Izvēlies paņemt 2 vai 3 akmentiņus: ")
+        #atgriež spēlētāja izvēli kā vesela skaitla vertibu
     return int(izv)
 
-
+# funkcija lauj izveleties,kurs sāks speli - speletajs vai dators
 def saks_speli():
+    #izveles ievade, kur tiek jautats, vai spēli saks speletajs vai dators. ievade saglabāta mainīgajā 'izvele'
     izvele = input("Vai spēli sāks spēlētājs (1) vai dators (2): ")
+    #cikls pārbauda,vai vērtība 1 un 2 ir derīga. ja ievade nav derīga, tiek izvadits kļūdas paziņojums un liek ievadīt vēlreiz
     while izvele not in ['1','2']:
         print("error")
         izvele = input("Vai spēli sāks spēlētājs (1) vai dators (2): ")
+        #atgriež galīgo izvēli
     return izvele
 
+#funkcija ļauj izvēlēties, kāds algoritms tiks izmantots spēles gaitā - Minimax vai Alfa-beta
 def algo_izvele():
-
+#izvada uz ekrāna, ka ir jāizvēlas algortims
     print("Izvēlieties algoritmu:")
+    #jāievada izvēle starp algoritmiem, ievade saglabāta mainīgajā 'izvele'
     izvele = input("Ievadiet M (Minimax) vai A (Alfa-beta): ")
+    #cikls parbauda, vai ievadītā vērtība atbilst opcijām ('M' vai 'A'). Ja nav atbilstoša, tad izvada kļūdu un liek ievadīt vēlreiz
     while izvele not in ['M', 'A']:
         print("error")
         izvele= input("Ievadiet M vai A: ")
+        #atgriež galīgo algoritma izvēli
     return izvele
 
-
+#spēles galvenā funkcija
 def play():
+    #izsauc funkciju, kas noskaidro, kurš sāks spēli - spēlētājs vai dators
     uzsacejs = saks_speli()
+    #tiek inicializēts sākotnējais spēles stāvoklis, izmantojot klasi Virs
     tagad_stavoklis = Virs('V1', akmeni, 0, 0, 0, 0, 1)
+    #inicializē mainīgos ar 0, tie tiks izmantoti, lai sekotu līdzi abu spēlētāju punktiem
     speletaja_punkti = 0
     datora_punkti = 0 
+    #izsauc funkciju, lai noskaidrotu, kādu algoritmu izmantos dators
     algoritms=algo_izvele()
+    #uzsāk ciklu, kas turpināsies, kamēr spēlē ir atlikuši akmentiņi
     while tagad_stavoklis.akmenuSk > 0:
-
+        # pārbauda, vai spēli sāks spēlētājs
         if uzsacejs == '1' or uzsacejs == '2' and tagad_stavoklis.akmenuSk <=0:
+            #izvada atlikušo akmentiņu skaitu
             print(f"Atlikušie akmentiņi: {tagad_stavoklis.akmenuSk}")
+            #izsauc funkciju, lai spēlētājs izvēlētos, cik akmentiņus paņemt
             spel_izvele = speletajs()
+            #samazina kopējo akmeņu skaitu atkarībā no spēlētāja paņemtā akmeņu daudzuma
             tagad_stavoklis.akmenuSk -= spel_izvele
+            #palielina spēlētāja punktu skaitu atkarībā, cik akmeņus spēlētājs paņēmis 
             speletaja_punkti += spel_izvele
-        
 
+            # pēc katras spēlētāja kartas tiek piešķirti vai atņemti punkti spēlētājam...
+            #...atkarībā, vai uz galda palikuši akmentiņi pāra skaitā(tiek pieskaitīti klāt) vai nepāra skaitā(tiek noņemti)
             if tagad_stavoklis.akmenuSk % 2 == 0:
                 speletaja_punkti += 2
             else:
                 speletaja_punkti -= 2
 
+            #tiek izvadīti pašreizējie rezultāti
             print(f"Tu paņēmi {spel_izvele} akmentiņus. Atlikušie akmeņi: {tagad_stavoklis.akmenuSk}")
             print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
-      
+            # pāriet uz datora kārtu
             uzsacejs = '2'
             
+            #pārbauda, vai dators uzsāk spēli un ir izvēlēts Minimax algoritms
         if tagad_stavoklis.akmenuSk > 0 and uzsacejs == '2' and algoritms == 'M':
             dators_izvele = MiniMax(tagad_stavoklis, 1, True)[1]
+            #tiek atjaunoti punkti un izvadīti pašreizējie rezultāti
             print (f"Dators paņem {dators_izvele} akmentiņus.")
             print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
 
@@ -263,31 +286,39 @@ def play():
            # print (f"Dators paņem {dators_izvele} akmentiņus.")
            # print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
 
-
+        #nosaka, ja dators ir veicis pieļaujamo izvēli pirms spēles stāvokļa atjaunināšanas
         if dators_izvele is not None:   
+            #samazinās akmeņu skaits pēc datora izvēlētā akmentiņu skaita
             tagad_stavoklis.akmenuSk -= dators_izvele
+            #palielina punktu skaitu datoram, cik dators ir paņēmis
             datora_punkti += dators_izvele
+
+            # pēc katras spēlētāja kartas tiek piešķirti vai atņemti punkti spēlētājam...
+            #...atkarībā, vai uz galda palikuši akmentiņi pāra skaitā(tiek pieskaitīti klāt) vai nepāra skaitā(tiek noņemti)
             if tagad_stavoklis.akmenuSk % 2 == 0:
                 datora_punkti += 2
             else:
                 datora_punkti -=2
+                #tiek izvadīti pašreizējie rezultāti
             print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
-
+            #pāriet uz spēlētāja kārtu
             uzsacejs = '1'
 
-
+        # ja akmentiņu vaiŗak nav uz galda, tiek izvadīti galējie spēlētāja un datora punkti
         if tagad_stavoklis.akmenuSk <=0:
             print("\nGala punkti:")
             print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
+            #ja punktu skaits ir vienāds, tad ir neizšķirts
             if speletaja_punkti == datora_punkti:
                 print("Neizšķirts!")
+                #ja speletaja punkti ir vairāk par datora punktiem, tad ir uzvara, pretēji - dators uzvar
             elif speletaja_punkti > datora_punkti:
                 print("Uzvara!")
             else:
                 print("Dators uzvar!")
             break
         
-
+##funkcija nodrošina, ka sāks spēles procesu
 play()
 
 
