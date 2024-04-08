@@ -116,58 +116,42 @@ def gajiens(gTips, genVirs, pasrV):
 
 # Kods ir izveidots pēc minimax.py parauga, izņemot šoreiz ir divi citi mainīgie - alpha un beta
 
-def AlphaBeta(akmentini, punkti, max_speletajs, alpha, beta):
-    if akmentini == 0:
-        return punkti, 0
+def AlphaBetaInit(virsotne, dzilums, max_speletajs):
+    alpha = float('-inf')
+    beta = float('inf')
+    return AlphaBeta(virsotne, dzilums, alpha, beta, max_speletajs)
+
+def AlphaBeta(virsotne, dzilums, alpha, beta, max_speletajs):
+    if virsotne.akmenuSk == 0 or dzilums == 0:
+        return virsotne.p1 - virsotne.p2, None
 
     if max_speletajs:
         maxNovert = float('-inf')
-        alpha = float('-inf')
-        beta = float('inf')
-        labakais_gaj = None
+        labakais_gajiens = None
         for gajiens in [2,3]:
-            if akmentini >= gajiens:
-                atlikusie_akmentini = akmentini - gajiens
-                punkti_jaunie = punkti + gajiens
-
-                if atlikusie_akmentini % 2 == 0:
-                    punkti_jaunie += 2
-                else:
-                    punkti_jaunie -= 2
-
-                novertejums = AlphaBeta(atlikusie_akmentini, punkti_jaunie, False, alpha, beta)[0]
-                if novertejums > maxNovert:
-                    maxNovert = novertejums
-                    labakais_gaj = gajiens
-
-                alpha = max(alpha, novertejums)
-                if beta <= alpha:
+            if virsotne.akmenuSk >= gajiens:
+                jauna_virsotne = Virs(0,virsotne.akmenuSk ,virsotne.p1,virsotne.a1,virsotne.p2,virsotne.a2,virsotne.lvl+1)
+                vertiba = AlphaBeta(jauna_virsotne, dzilums - 1, alpha, beta, False)[0]
+                if vertiba > maxNovert:
+                    maxNovert = vertiba
+                    labakais_gajiens = gajiens
+                alpha = max(alpha, vertiba) # Jaunā Alpha tiek izvēlēta starp pašreizējo alpha vērtību, vai izvēlēto alpha vērtību
+                if beta <= alpha: # Alpha nekad nevar būt mazāks par beta
                     break
-
-        return maxNovert, labakais_gaj
+        return maxNovert, labakais_gajiens
     else:
         minNovert = float('inf')
-        labakais_gaj = None
         for gajiens in [2,3]:
-            if akmentini >= gajiens:
-                atlikusie_akmentini = akmentini - gajiens
-                punkti_jaunie = punkti + gajiens
-
-                if atlikusie_akmentini % 2 == 0:
-                    punkti_jaunie += 2
-                else:
-                    punkti_jaunie -= 2
-
-                novertejums = AlphaBeta(atlikusie_akmentini, punkti_jaunie, True, alpha, beta)[0]
-                if novertejums < minNovert:
-                    minNovert = novertejums
-                    labakais_gaj = gajiens
-
-                beta = min(beta, novertejums)
-                if beta <= alpha:
+            if virsotne.akmenuSk >= gajiens:
+                jauna_virsotne = Virs(0,virsotne.akmenuSk,virsotne.p1,virsotne.a1,virsotne.p2,virsotne.a2,virsotne.lvl+1)
+                vertiba = AlphaBeta(jauna_virsotne, dzilums - 1, alpha, beta, True)[0]
+                if vertiba < minNovert:
+                    minNovert = vertiba
+                beta = min(beta, vertiba) # Jaunā Beta tiek izvēlēta starp pašreizējo beta vērtību, vai izvēlēto beta vērtību
+                if beta <= alpha: # Alpha nekad nevar būt mazāks par beta
                     break
+        return minNovert, 0
 
-        return minNovert, labakais_gaj
 ################################
 # funkcija tiek definēta:
 #virsotne - speles stāvoklis
@@ -318,8 +302,14 @@ class GameGUI:
             self.dators_izvele = MiniMax(self.tagad_stavoklis, 10, True)[1]
 
         elif self.algoritms == 'A':
-            dators_izvele = AlphaBeta(self.tagad_stavoklis.akmenuSk,self.datora_punkti,True)
-
+            self.dators_izvele = AlphaBetaInit(self.tagad_stavoklis, 10, True)[1]
+        if  self.tagad_stavoklis.akmenuSk>0:
+            try:
+                self.dators_izvele=int(self.dators_izvele)
+            except ValueError:
+                self.label.config(text="")
+        else:
+            return
         if self.dators_izvele is not None:
             self.tagad_stavoklis.akmenuSk -= self.dators_izvele
             self.datora_punkti += self.dators_izvele
