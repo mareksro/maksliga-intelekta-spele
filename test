@@ -329,7 +329,7 @@ class GameGUI:
         self.akmen_inf.config(text=f"Atlikuši akmeņi: {self.tagad_stavoklis.akmenuSk}")
         self.playp.config(text=f"Spēlētāja punkti: {self.speletaja_punkti}")
         self.datorp.config(text=f"Datora punkti: {self.datora_punkti}")
-        if self.tagad_stavoklis.akmenuSk <=1:
+        if self.tagad_stavoklis.akmenuSk <=0:
             if self.speletaja_punkti == self.datora_punkti:
                 self.akmen_inf.config(text=f"Neizšķirts!",fg="seashell4")
             elif self.speletaja_punkti > self.datora_punkti:
