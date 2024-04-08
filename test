@@ -312,7 +312,7 @@ class GameGUI:
 
     def comp_move(self):
             if self.algoritms == 'M':
-                self.dators_izvele = MiniMax(self.tagad_stavoklis, 1, True)[1]
+                self.dators_izvele = MiniMax(self.tagad_stavoklis, 10, True)[1]
 
 
             elif self.algoritms == 'A':
