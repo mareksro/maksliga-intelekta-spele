@@ -1,12 +1,11 @@
 # Kods ir izveidots pēc minimax.py parauga, izņemot šoreiz ir divi citi mainīgie - alpha un beta
 
 def AlphaBeta(akmentini, punkti, max_speletajs, alpha, beta):
+
     if akmentini == 0:
         return punkti, 0
 
     if max_speletajs:
-        maxNovert = float('-inf')
-        alpha = float('-inf')
         beta = float('inf')
         labakais_gaj = None
         for gajiens in [2,3]:
