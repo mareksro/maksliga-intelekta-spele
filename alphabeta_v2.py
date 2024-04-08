@@ -1,3 +1,5 @@
+# Kods ir izveidots pēc minimax.py parauga, izņemot šoreiz ir divi citi mainīgie - alpha un beta
+
 def AlphaBeta(akmentini, punkti, max_speletajs, alpha, beta):
     if akmentini == 0:
         return punkti, 0
