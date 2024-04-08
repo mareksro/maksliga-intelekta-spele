@@ -203,9 +203,9 @@ def MiniMax(virsotne,dzilums,max_speletajs):
         return minNovert, 0
         
 #########################################
-# def AlphaBetaDriver inicializē alpha un beta vērtības, lai tās netiktu atkārtotas ik reizi, kad tiek izsaukta AlphaBeta() funkcija
+# def AlphaBetaInit inicializē alpha un beta vērtības, lai tās netiktu atkārtotas ik reizi, kad tiek izsaukta AlphaBeta() funkcija
 
-def AlphaBetaDriver(virsotne, dzilums, max_speletajs): 
+def AlphaBetaInit(virsotne, dzilums, max_speletajs): 
     alpha = float('-inf')
     beta = float('inf')
     return AlphaBeta(virsotne, dzilums, alpha, beta, max_speletajs)
