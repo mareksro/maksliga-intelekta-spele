@@ -308,7 +308,7 @@ def play():
             
             #pārbauda, vai dators uzsāk spēli un ir izvēlēts Minimax algoritms
         if tagad_stavoklis.akmenuSk > 0 and uzsacejs == '2' and algoritms == 'M':
-            dators_izvele = MiniMax(tagad_stavoklis, 1, True)[1]
+            dators_izvele = MiniMax(tagad_stavoklis, 10, True)[1]
             #tiek atjaunoti punkti un izvadīti pašreizējie rezultāti
             print (f"Dators paņem {dators_izvele} akmentiņus.")
             print(f"Spēlētāja punkti: {speletaja_punkti}, Datora punkti: {datora_punkti}")
