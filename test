@@ -198,21 +198,24 @@ def MiniMax(virsotne,dzilums,max_speletajs):
 
 
 class GameGUI:
-    def __init__(self, master):
 
+    def __init__(self, master):
+    #Tiek izveidots lietojumprogrammas logs un visas nepieciešamās pogas un ievades lauki
         self.master = master
         self.master.title("Spēle ar akmeņiem")
+    #geometry nosaka loga izmēru
         master.geometry("400x400")
 
         self.label = tk.Label(text="Laipni lūdzam spēlē! Izvēlieties akmeņu skaitu no 50 līdz 70")
+    #Pack() novieto izveidoto lauku logā
         self.label.pack()
-
+    #izveidots ievades lauks, kurā var ievadīt akmeņu skaitu
         self.akmen_entry = tk.Entry()
         self.akmen_entry.pack()
-
+    #Poga izsauc funkciju play(Kas ir atbildīga par spēles sākumu)
         self.start_button = tk.Button(text="Sākt spēli", command=self.play)
         self.start_button.pack()
-
+    #Poga izsauc funkciju new_game(Kas ir atbildīga par spēles atjauninājumu)
         self.new_game_button = tk.Button(text="Jauna spēle", command=self.new_game)
         self.new_game_button.pack()
 
@@ -220,7 +223,7 @@ class GameGUI:
         self.saks_speli.pack()
 
         self.stav = tk.StringVar(value='1')
-
+    #radiobutton dod iespēju izvēlēties vienu no 2 piedāvātajām iespējām
         self.play_radio = tk.Radiobutton(text="Lietotājs", variable=self.stav, value='1')
         self.play_radio.pack()
 
@@ -242,11 +245,13 @@ class GameGUI:
         self.akmen_izvele = tk.Label(text="Izvēlieties ņemamo akmeņu skaitu:")
         self.akmen_izvele.pack()
 
+    #Frame, izveido lauku, kurā atradīsies akmeņa izvēles pogas
         self.akmen_izvele_frame = tk.Frame()
         self.akmen_izvele_frame.pack()
-
+    #Poga izsauc funkciju play_move(Kas ir atbildīga par spēlētāja gājienu) un atgriež lietotāja izvēlēto akmen. vērtību
         self.button2 = tk.Button(self.akmen_izvele_frame, text="2 akmeņi", command=lambda: self.play_move(2))
         self.button2.pack(side='left')
+    #Sākumā poga ir izslēgta, lai novērstu kļūdas koda darbā
         self.button2.config(state="disabled")
 
         self.button3 = tk.Button(self.akmen_izvele_frame, text="3 akmeņi", command=lambda: self.play_move(3))
@@ -263,46 +268,62 @@ class GameGUI:
 
         self.alphabeta_radio = tk.Radiobutton(text="Alpha-Beta", variable=self.algo_izvele, value='A')
         self.alphabeta_radio.pack()
-
+#funkcija atbild par spēles uzsākšanu
     def play(self):
         self.label.config(text="Spēle sākusies")
+    #Ievadītās informācijas pareizības pārbaude
         try:
+        #mainīgais saņem sākotnēji ievadītā akmeņu skaita vērtību
             self.akmeni = int(self.akmen_entry.get())
+        #Ievadītās informācijas pareizības pārbaude
             if self.akmeni>70 or self.akmeni<50:
                 self.label.config(text="!Izvēlieties akmeņu skaitu no 50 līdz 70!")
                 return
+        #mainīgais saņem informāciju par to, kurš sāk spēli
             self.uzsacejs = self.stav.get()
+        #izveido virsotnes objektu ar sākuma parametriem
             self.tagad_stavoklis = Virs('V1', self.akmeni, 0, 0, 0, 0, 1)
             self.speletaja_punkti = 0
             self.datora_punkti = 0
+        #mainīgais saņem informāciju par to, kuru algoritmu izmantos programma
             self.algoritms= self.algo_izvele.get()
+        #ja pirmais gājiens ir datora gājiens,tad tiek izsaukta funkcija comp_move, kas atbild par datora gājienu
             if self.uzsacejs == '2':
                 self.comp_move()
+            #pēc datora gājiena kļūst pieejamas lietotāja akmeņu izvēles pogas
                 self.button2.config(state="normal")
                 self.button3.config(state="normal")
+        #ja pirmais gājiens ir lietotāja gājiens, tad kļūst pieejamas lietotāja akmeņu izvēles pogas
             else:
                 self.button2.config(state="normal")
                 self.button3.config(state="normal")
         except ValueError:
             self.label.config(text="Ievadiet pareizo akmeņu skaitu.")
+    #start_button poga kļūst izslēgta, lai novērstu kļūdas koda darbā
         self.start_button.config(state="disabled")
-
+#funkcija play_move ir atbildīga par lietotāja gājienu, funkcija saņem arī lietotāja izvēlēto akmeņu skaitu
     def play_move(self,move):
+    #No akmeņu kopskaita atņem iegūto punktu skaitu un pievieno to lietotāja punktu skaitam
         self.tagad_stavoklis.akmenuSk -= move
         self.speletaja_punkti += move
+    # ja pēc akmentiņu paņemšanas uz galda ir palicis pāra akmentiņu skaits, tad spēlētāja punktiem tiek pieskaitīti 2 punkti, bet ja nepāra skaits, tad tiek atņemti 2 punkti.
         if self.tagad_stavoklis.akmenuSk % 2 == 0:
             self.speletaja_punkti += 2
         else:
             self.speletaja_punkti -= 2
+    #pārbaude vai spēle ir beigusies pēc gājiena
         self.game_over_check()
+    #atdot gājienu datoram
         self.comp_move()
-
+#funkcija,kura ir atbildīga par datora gājienu
     def comp_move(self):
+    #lietotāja izvēletu algoritmu izmantošana
         if self.algoritms == 'M':
             self.dators_izvele = MiniMax(self.tagad_stavoklis, 10, True)[1]
         elif self.algoritms == 'A':
             self.dators_izvele = AlphaBetaInit(self.tagad_stavoklis, 10, True)[1]
         try:
+        #saņemto datus pārbaude, lai izvairītos no kļūdām
             self.dators_izvele=int(self.dators_izvele)
         except ValueError and TypeError:
             return
@@ -314,21 +335,27 @@ class GameGUI:
             else:
                 self.datora_punkti -=2
             self.game_over_check()
-
+#funckija new_game atbildīga par spēles atjauninājumu
     def new_game(self):
         self.label.config(text="Izvēlieties akmeņu skaitu (no 50 līdz 70):")
+    #Noņem ievadīto sākotnējo akmeņu skaitu
         self.akmen_entry.delete(0, tk.END)
+    #notīra visus laukus ar spēles stāvokļa informāciju
         self.akmen_inf.config(text="",fg="black")
         self.playp.config(text="")
         self.datorp.config(text="")
+    #atgriež pogas to sākotnējā stāvoklī
         self.button2.config(state="disabled")
         self.button3.config(state="disabled")
+    #padara start_game pogu pieejamu
         self.start_button.config(state="normal")
-
+#funckija game_over_check atbildīga par pašreizējo spēles stāvokli parādīšanu, kā arī pārbauda vai spēle ir beigusies
     def game_over_check(self):
+    #izvada informaciju par spēles stāvokli (lietotāja un datora punkti, atlikušo akmeņu skaitu)
         self.akmen_inf.config(text=f"Atlikuši akmeņi: {self.tagad_stavoklis.akmenuSk}")
         self.playp.config(text=f"Spēlētāja punkti: {self.speletaja_punkti}")
         self.datorp.config(text=f"Datora punkti: {self.datora_punkti}")
+    #pārbaude vai spēle ir beigusies un parāda ziņojumu atkarībā no spēles rezultātiem
         if self.tagad_stavoklis.akmenuSk <=0:
             if self.speletaja_punkti == self.datora_punkti:
                 self.akmen_inf.config(text=f"Neizšķirts!",fg="seashell4")
@@ -337,6 +364,7 @@ class GameGUI:
                 self.playp.config(text=f"Spēlētāja punkti: {self.speletaja_punkti}")
             else:
                 self.akmen_inf.config(text=f"Dators uzvar!",fg="maroon")
+        #atgriež pogas to sākotnējā stāvoklī
             self.button2.config(state="disabled")
             self.button3.config(state="disabled")
 
